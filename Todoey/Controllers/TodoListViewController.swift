@@ -7,27 +7,22 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
 
 //    var itemArray = ["Find Sharon" , "Get Tickets" , "Get Passport" , "Go to Airport" ]
 //    let defaults = UserDefaults.standard
-    var itemArray = [Item]()
 //    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first.appendPathComponent("Items.plist")
+    
+    var itemArray = [Item]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let newItem = Item()
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
-        newItem.title = "Find Sharon"
-        itemArray.append(newItem)
-//        print(dataFilePath)
-//        loadItems()
-        
-//      UserDefaults version
-//        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-//            itemArray = items
-//        }
+        loadItems()
     } // end viewDidLoad()
 
     ///////////////////////////////////////////
@@ -51,19 +46,25 @@ class TodoListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Selection: " + itemArray[indexPath.row].title)
+        //print("Selection: " + itemArray[indexPath.row].title)
+//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+//        } else {
+//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+//        }
+        // CRUD - Update
+       //itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        // itemArray[indexPath.row].setValue("Completed", forKey: "title" )
         
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
-        
-        
+        // CRUD - Delete
+        self.context.delete(itemArray[indexPath.row])
+        itemArray.remove(at: indexPath.row)
+        saveItems()
+
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-// MARK - Add New Items
+// MARK - Add New Items CRUD - Create
     
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
@@ -71,16 +72,15 @@ class TodoListViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // what will happen once user clicks the Add Item button on our UIAlert
-            print("Success!Added  " + textField.text!)
-            let newItem = Item()
-            newItem.title = textField.text!
-            self.itemArray.append(newItem)
-            self.tableView.reloadData()
+            // print("Success!Added  " + textField.text!)
             
-// UserDefaults version
-//            self.itemArray.append(textField.text!)
-//            self.defaults.set(self.itemArray, forKey: "TodoListArray")
-//            self.tableView.reloadData()
+            let newItem = Item(context: self.context)
+            newItem.title = textField.text!
+            newItem.done = false
+            self.itemArray.append(newItem)
+            self.saveItems()
+            
+
         }
         
         alert.addTextField { (alertTextField) in
@@ -95,10 +95,27 @@ class TodoListViewController: UITableViewController {
     ///////////////////////////////////////////
     //MARK - Model Manupulation Methods
 
-//    func loadItems() {
-//        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
-//        tableView.reloadData()
-//    }
+    func saveItems() {
+        do {
+            try context.save()
+        } catch {
+            print("Error saving context ==> \(error)")
+        }
+        self.tableView.reloadData()
+    }
+    
+    
+    
+    
+    // CRUD - Read
+    func loadItems() {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        do {
+        try itemArray = context.fetch(request)
+        } catch {
+            print("Error fetching data from context \(error)")
+        }
+    }
 
 
 
@@ -111,3 +128,10 @@ class TodoListViewController: UITableViewController {
 
 } // end of class
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Boneyard
+// UserDefaults version
+//            self.itemArray.append(textField.text!)
+//            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+//            self.tableView.reloadData()
