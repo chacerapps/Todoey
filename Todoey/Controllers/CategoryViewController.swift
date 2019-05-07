@@ -4,7 +4,7 @@
 //
 //  Created by ccztr on 3/24/19.
 //  Copyright © 2019 Chacer. All rights reserved.
-//  Updated 5/06/2019
+//  Updated 5/07/2019
 
 import UIKit
 import RealmSwift
@@ -109,6 +109,7 @@ class CategoryViewController: SwipeTableViewController {
             newCategory.name = textField.text!
             newCategory.color = UIColor.randomFlat.hexValue()
             self.save(category: newCategory)
+            print(newCategory)
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Creat New Category"

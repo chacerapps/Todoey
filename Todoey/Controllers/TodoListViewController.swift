@@ -4,7 +4,7 @@
 //
 //  Created by ccztr on 2/18/19.
 //  Copyright © 2019 Chacer. All rights reserved.
-//  Updated 5/06/2019  
+//  Updated 5/07/2019  
 // 
 
 import UIKit
@@ -15,7 +15,7 @@ class TodoListViewController: SwipeTableViewController {
  
     var todoItems: Results<Item>?
     let realm = try! Realm()
-    
+    var cellColor : String = ""
     var selectedCategory : Category? {
         didSet {
             navigationItem.title = selectedCategory?.name
@@ -71,14 +71,16 @@ class TodoListViewController: SwipeTableViewController {
     
     // Declare cellForRowAtIndexPath here:
      override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-     
+        
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
-            
-            if let color = FlatSkyBlue().darken(byPercentage: CGFloat(indexPath.row / todoItems!.count)) {
+           
+            if let color = UIColor(hexString: selectedCategory!.color)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
                     cell.backgroundColor = color
-            }
+                    cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+                }
+            
             cell.accessoryType = item.done ? .checkmark : .none
         } else {
                     cell.textLabel?.text = "No Items Added Yet"
