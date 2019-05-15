@@ -18,7 +18,7 @@ class TodoListViewController: SwipeTableViewController {
     var cellColor : String = ""
     var selectedCategory : Category? {
         didSet {
-            navigationItem.title = selectedCategory?.name
+            //navigationItem.title = selectedCategory?.name
             loadItems()
         }
     }
@@ -26,41 +26,34 @@ class TodoListViewController: SwipeTableViewController {
         super.viewDidLoad()
         tableView.rowHeight = 80.0
         tableView.separatorStyle = .none
+        //UISearchBar.appearance().barTintColor = UIColor.black
     }
  
-//    override func viewWillAppear(_ animated: Bool) {
-//
-//        title = selectedCategory?.name
-//
-//        guard let colorHex = selectedCategory?.color else { fatalError() }
-//
-//        updateNavBar(withHexCode: colorHex)
-//    }
-//
-//    override func viewWillDisappear(_ animated: Bool) {
-//
-//        updateNavBar(withHexCode: "1D9BF6")
-//
-//    }
+    override func viewWillAppear(_ animated: Bool) {
+        title = selectedCategory?.name
+        guard let colorHex = selectedCategory?.color else { fatalError() }
+        updateNavBar(withHexCode: colorHex)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        updateNavBar(withHexCode: "1D9BF6")
+    }
     
     //MARK: - Nav Bar Setup Methods
     
-//    func updateNavBar(withHexCode colourHexCode: String){
-//
-//        guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist.")}
-//
-//        guard let navBarColor = UIColor(hexString: colourHexCode) else { fatalError()}
-//
-//        navBar.barTintColor = navBarColor
-//
-//        navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
-//
-//        navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true)]
-//
-//        searchBar.barTintColor = navBarColor
-//
-//    }
-    
+    func updateNavBar(withHexCode colourHexCode: String){
+        guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist.")}
+        guard let navBarColor = UIColor(hexString: colourHexCode) else { fatalError()}
+        navBar.barTintColor = navBarColor
+        navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+        navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true)]
+        print("navBarColor is: \(navBarColor)")
+      
+      //  searchBar.barTintColor = navBarColor <===<<< UISearchBar -> String has no element barTintColor ERROR
+        UISearchBar.appearance().barTintColor = navBarColor
+       
+    }
+
     
     //MARK: - TableView DataSource Methods
     
